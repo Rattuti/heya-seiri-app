@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お部屋整理チェッカー</title>
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --panel: #ffffff;
+    --border: #e5e1d8;
+    --text: #2b2a26;
+    --muted: #766f60;
+    --accent: #6b8f71;
+    --accent-dark: #4f6b55;
+    --great: #6b8f71;
+    --good: #6a8fa3;
+    --warn: #c17a3f;
+    --bad: #b3543f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); margin: 0 0 20px; font-size: 0.9rem; }
+  .layout { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 880px; margin: 0 auto; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .panel h2 { font-size: 1rem; margin: 0 0 12px; }
+
+  /* score summary */
+  .score-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .score-circle {
+    width: 96px; height: 96px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    background: conic-gradient(var(--score-color, var(--muted)) calc(var(--score-pct, 0) * 1%), var(--border) 0);
+    flex-shrink: 0;
+  }
+  .score-circle::before {
+    content: "";
+    position: absolute;
+  }
+  .score-inner {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: var(--panel);
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+  }
+  .score-inner .pct { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .score-inner .pct-sign { font-size: 0.7rem; color: var(--muted); }
+  .score-detail { flex: 1; min-width: 180px; }
+  .score-verdict { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+  .score-sub { color: var(--muted); font-size: 0.88rem; }
+
+  .cat-progress-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .cat-progress-item { display: grid; grid-template-columns: 110px 1fr 46px; align-items: center; gap: 10px; font-size: 0.82rem; }
+  .cat-progress-item .bar-track { height: 8px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .cat-progress-item .bar-fill { height: 100%; border-radius: 999px; }
+  .cat-progress-item .bar-count { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* checklist */
+  .checklist-cat { margin-bottom: 18px; }
+  .checklist-cat:last-child { margin-bottom: 0; }
+  .checklist-cat h3 { font-size: 0.92rem; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+  .cat-count { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+  .item-list { display: flex; flex-direction: column; gap: 2px; }
+  .item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 6px; border-radius: 6px;
+  }
+  .item:hover { background: var(--bg); }
+  .item input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .item label { cursor: pointer; flex: 1; font-size: 0.92rem; }
+  .item.checked label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border); }
+  .item .rm {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 0.85rem; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.1s;
+  }
+  .item:hover .rm { opacity: 1; }
+  .item .rm:hover { color: var(--bad); }
+
+  .add-row { display: flex; gap: 8px; margin-top: 10px; }
+  select, input[type=text], button {
+    font: inherit;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
+  button { cursor: pointer; background: var(--accent); color: #fff; border: none; }
+  button:hover { background: var(--accent-dark); }
+  button.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+  .hint { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+
+  /* photo analysis */
+  .photo-dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .photo-dropzone.drag { border-color: var(--accent); background: var(--bg); }
+  .photo-dropzone input { display: none; }
+  .photo-preview-row { display: flex; gap: 16px; align-items: flex-start; margin-top: 14px; flex-wrap: wrap; }
+  #photoThumb { width: 140px; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
+  .photo-metrics { flex: 1; min-width: 200px; }
+  .photo-score-verdict { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+  .metric-bar-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+  .metric-bar-row .bar-track { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .metric-bar-row .bar-fill { height: 100%; border-radius: 999px; background: var(--accent); }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div>
+    <h1>お部屋整理チェッカー</h1>
+    <p class="subtitle">チェックリストに沿って部屋の状態を確認すると、整理度を自動判定します(データはブラウザ内のみ・保存はされません)</p>
+  </div>
+
+  <div class="panel">
+    <div class="score-row">
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-inner">
+          <span class="pct" id="scorePct">0%</span>
+          <span class="pct-sign">整理度</span>
+        </div>
+      </div>
+      <div class="score-detail">
+        <div class="score-verdict" id="scoreVerdict">まずはチェックを始めましょう</div>
+        <div class="score-sub" id="scoreSub">0 / 0 項目 完了</div>
+      </div>
+    </div>
+    <div class="cat-progress-list" id="catProgressList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>写真から簡易判定(参考値)</h2>
+    <div class="photo-dropzone" id="photoDropzone">
+      <div>お部屋の写真をここにドラッグ&ドロップ、またはクリックして選択</div>
+      <input type="file" id="photoInput" accept="image/*">
+    </div>
+    <div class="photo-preview-row" id="photoResult" style="display:none;">
+      <img id="photoThumb" alt="アップロードした写真のプレビュー">
+      <div class="photo-metrics">
+        <div class="photo-score-verdict" id="photoVerdict"></div>
+        <div class="hint" id="photoScoreSub" style="margin-top:0;"></div>
+        <div class="metric-bar-row">
+          <span>輪郭の密度</span>
+          <div class="bar-track"><div class="bar-fill" id="edgeBar"></div></div>
+        </div>
+        <div class="metric-bar-row">
+          <span>色・明暗のばらつき</span>
+          <div class="bar-track"><div class="bar-fill" id="varBar"></div></div>
+        </div>
+        <button type="button" class="secondary" id="photoClearBtn" style="margin-top:10px;">写真をクリア</button>
+      </div>
+    </div>
+    <p class="hint">写真の色・明暗の分布と輪郭の複雑さをブラウザ内で機械的に解析した目安です。実際の画像認識(物体認識)ではないため、実際の整理状態と異なる場合があります。写真は保存・送信されず、ブラウザ内の処理のみで完結します。</p>
+  </div>
+
+  <div class="panel">
+    <div class="row" style="margin-bottom: 4px;">
+      <h2 style="margin:0;">チェックリスト</h2>
+      <button type="button" class="secondary" id="resetBtn">全てリセット</button>
+    </div>
+    <div id="checklistContainer"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DEFAULT_CATEGORIES = [
+    {
+      name: "床・フロア",
+      items: [
+        "物が床に散らかっていない",
+        "掃除機・フローリングワイパーをかけた",
+        "ケーブル類がまとまっている"
+      ]
+    },
+    {
+      name: "机・デスク",
+      items: [
+        "書類や文房具が整理されている",
+        "デスク上に不要なものがない",
+        "充電器・ケーブルが整理されている"
+      ]
+    },
+    {
+      name: "ベッド・寝具",
+      items: [
+        "布団・ベッドが整えられている",
+        "枕やクッションが定位置にある"
+      ]
+    },
+    {
+      name: "収納・クローゼット",
+      items: [
+        "服がクローゼット・タンスにしまわれている",
+        "収納の扉や引き出しが閉まっている"
+      ]
+    },
+    {
+      name: "ゴミ・洗濯物",
+      items: [
+        "ゴミ箱が満杯でない",
+        "洗濯物が溜まっていない(かご・洗濯機の中にある)"
+      ]
+    },
+    {
+      name: "その他",
+      items: [
+        "使った食器がキッチンに戻されている",
+        "窓が開けられて換気されている"
+      ]
+    }
+  ];
+
+  // state: array of { name, items: [{ text, checked }] }
+  var state = DEFAULT_CATEGORIES.map(function (cat) {
+    return {
+      name: cat.name,
+      items: cat.items.map(function (text) { return { text: text, checked: false }; })
+    };
+  });
+
+  function totalCounts() {
+    var total = 0, checked = 0;
+    state.forEach(function (cat) {
+      cat.items.forEach(function (item) {
+        total++;
+        if (item.checked) checked++;
+      });
+    });
+    return { total: total, checked: checked };
+  }
+
+  function scoreColor(pct) {
+    if (pct >= 90) return getVar("--great");
+    if (pct >= 70) return getVar("--good");
+    if (pct >= 50) return getVar("--warn");
+    return getVar("--bad");
+  }
+
+  function getVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function verdictText(pct, total) {
+    if (total === 0) return "チェック項目がありません";
+    if (pct >= 90) return "完璧に整理されています ✓";
+    if (pct >= 70) return "おおむね整理されています";
+    if (pct >= 50) return "少し片付けが必要です";
+    if (pct > 0) return "片付けが必要です";
+    return "まずはチェックを始めましょう";
+  }
+
+  function renderChecklist() {
+    var container = document.getElementById("checklistContainer");
+    container.innerHTML = "";
+
+    state.forEach(function (cat, catIdx) {
+      var checkedCount = cat.items.filter(function (i) { return i.checked; }).length;
+
+      var block = document.createElement("div");
+      block.className = "checklist-cat";
+
+      var h3 = document.createElement("h3");
+      h3.textContent = cat.name + " ";
+      var count = document.createElement("span");
+      count.className = "cat-count";
+      count.textContent = "(" + checkedCount + "/" + cat.items.length + ")";
+      h3.appendChild(count);
+      block.appendChild(h3);
+
+      var list = document.createElement("div");
+      list.className = "item-list";
+
+      cat.items.forEach(function (item, itemIdx) {
+        var row = document.createElement("div");
+        row.className = "item" + (item.checked ? " checked" : "");
+
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        var cbId = "chk-" + catIdx + "-" + itemIdx;
+        cb.id = cbId;
+        cb.checked = item.checked;
+        cb.addEventListener("change", function () {
+          item.checked = cb.checked;
+          renderAll();
+        });
+
+        var label = document.createElement("label");
+        label.htmlFor = cbId;
+        label.textContent = item.text;
+
+        var rm = document.createElement("button");
+        rm.type = "button";
+        rm.className = "rm";
+        rm.textContent = "削除";
+        rm.addEventListener("click", function () {
+          cat.items.splice(itemIdx, 1);
+          renderAll();
+        });
+
+        row.appendChild(cb);
+        row.appendChild(label);
+        row.appendChild(rm);
+        list.appendChild(row);
+      });
+
+      block.appendChild(list);
+
+      var addRow = document.createElement("div");
+      addRow.className = "add-row";
+      var input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "項目を追加(例: 本棚を整頓した)";
+      input.style.flex = "1";
+      var addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "secondary";
+      addBtn.textContent = "追加";
+      function addItem() {
+        var text = input.value.trim();
+        if (!text) return;
+        cat.items.push({ text: text, checked: false });
+        input.value = "";
+        renderAll();
+      }
+      addBtn.addEventListener("click", addItem);
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") addItem();
+      });
+      addRow.appendChild(input);
+      addRow.appendChild(addBtn);
+      block.appendChild(addRow);
+
+      container.appendChild(block);
+    });
+  }
+
+  function renderScore() {
+    var counts = totalCounts();
+    var pct = counts.total > 0 ? Math.round((counts.checked / counts.total) * 100) : 0;
+    var color = scoreColor(pct);
+
+    var circle = document.getElementById("scoreCircle");
+    circle.style.setProperty("--score-pct", pct);
+    circle.style.setProperty("--score-color", color);
+    circle.style.position = "relative";
+
+    document.getElementById("scorePct").textContent = pct + "%";
+    document.getElementById("scoreVerdict").textContent = verdictText(pct, counts.total);
+    document.getElementById("scoreVerdict").style.color = counts.total ? color : "";
+    document.getElementById("scoreSub").textContent = counts.checked + " / " + counts.total + " 項目 完了";
+
+    var list = document.getElementById("catProgressList");
+    list.innerHTML = "";
+    state.forEach(function (cat) {
+      var checkedCount = cat.items.filter(function (i) { return i.checked; }).length;
+      var catPct = cat.items.length > 0 ? (checkedCount / cat.items.length) * 100 : 0;
+      var catColor = scoreColor(catPct);
+
+      var row = document.createElement("div");
+      row.className = "cat-progress-item";
+
+      var name = document.createElement("div");
+      name.textContent = cat.name;
+
+      var track = document.createElement("div");
+      track.className = "bar-track";
+      var fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = catPct + "%";
+      fill.style.background = catColor;
+      track.appendChild(fill);
+
+      var countEl = document.createElement("div");
+      countEl.className = "bar-count";
+      countEl.textContent = checkedCount + "/" + cat.items.length;
+
+      row.appendChild(name);
+      row.appendChild(track);
+      row.appendChild(countEl);
+      list.appendChild(row);
+    });
+  }
+
+  function renderAll() {
+    renderChecklist();
+    renderScore();
+  }
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    state.forEach(function (cat) {
+      cat.items.forEach(function (item) { item.checked = false; });
+    });
+    renderAll();
+  });
+
+  // ---------- Photo analysis (local heuristic, no network/AI) ----------
+  function photoVerdictText(score) {
+    if (score >= 75) return "きれいに片付いていそうです";
+    if (score >= 55) return "おおむね整理されていそうです";
+    if (score >= 35) return "やや散らかっていそうです";
+    return "かなり散らかっていそうです";
+  }
+
+  function analyzePhoto(img, dataUrl) {
+    var maxW = 240;
+    var scale = Math.min(1, maxW / img.width);
+    var w = Math.max(1, Math.round(img.width * scale));
+    var h = Math.max(1, Math.round(img.height * scale));
+    var canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, w, h);
+    var data = ctx.getImageData(0, 0, w, h).data;
+
+    var gray = new Float32Array(w * h);
+    for (var i = 0, p = 0; i < data.length; i += 4, p++) {
+      gray[p] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    }
+
+    // edge density: simple gradient-magnitude edge detection
+    var edgeCount = 0, totalInner = 0;
+    var threshold = 40;
+    for (var y = 1; y < h - 1; y++) {
+      for (var x = 1; x < w - 1; x++) {
+        var idx = y * w + x;
+        var gx = gray[idx - 1] - gray[idx + 1];
+        var gy = gray[idx - w] - gray[idx + w];
+        var mag = Math.sqrt(gx * gx + gy * gy);
+        totalInner++;
+        if (mag > threshold) edgeCount++;
+      }
+    }
+    var edgeDensity = totalInner > 0 ? edgeCount / totalInner : 0;
+    var edgeDensityNormalized = Math.min(1, edgeDensity / 0.25);
+
+    // block variance: texture/color busyness across an 8x8 grid
+    var gridSize = 8;
+    var blockW = Math.max(1, Math.floor(w / gridSize));
+    var blockH = Math.max(1, Math.floor(h / gridSize));
+    var stdSum = 0, blockCount = 0;
+    for (var by = 0; by < h; by += blockH) {
+      for (var bx = 0; bx < w; bx += blockW) {
+        var sum = 0, sumSq = 0, n = 0;
+        for (var yy = by; yy < Math.min(h, by + blockH); yy++) {
+          for (var xx = bx; xx < Math.min(w, bx + blockW); xx++) {
+            var v = gray[yy * w + xx];
+            sum += v; sumSq += v * v; n++;
+          }
+        }
+        if (n > 0) {
+          var mean = sum / n;
+          var variance = sumSq / n - mean * mean;
+          stdSum += Math.sqrt(Math.max(0, variance));
+          blockCount++;
+        }
+      }
+    }
+    var avgBlockStd = blockCount > 0 ? stdSum / blockCount : 0;
+    var varianceNormalized = Math.min(1, avgBlockStd / 60);
+
+    var clutterScore = Math.round((0.6 * edgeDensityNormalized + 0.4 * varianceNormalized) * 100);
+    var tidinessScore = Math.max(0, Math.min(100, 100 - clutterScore));
+
+    renderPhotoResult(dataUrl, tidinessScore, edgeDensityNormalized, varianceNormalized);
+  }
+
+  function renderPhotoResult(dataUrl, score, edgeNorm, varNorm) {
+    document.getElementById("photoResult").style.display = "flex";
+    document.getElementById("photoThumb").src = dataUrl;
+    var color = scoreColor(score);
+    var verdictEl = document.getElementById("photoVerdict");
+    verdictEl.textContent = photoVerdictText(score) + "(推定 " + score + " 点)";
+    verdictEl.style.color = color;
+    document.getElementById("photoScoreSub").textContent = "輪郭密度と色・明暗のばらつきから算出した参考値です";
+    var edgeBar = document.getElementById("edgeBar");
+    edgeBar.style.width = Math.round(edgeNorm * 100) + "%";
+    edgeBar.style.background = color;
+    var varBar = document.getElementById("varBar");
+    varBar.style.width = Math.round(varNorm * 100) + "%";
+    varBar.style.background = color;
+  }
+
+  function readImageFile(file) {
+    if (!file.type || file.type.indexOf("image/") !== 0) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () { analyzePhoto(img, reader.result); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function initPhotoPanel() {
+    var dropzone = document.getElementById("photoDropzone");
+    var input = document.getElementById("photoInput");
+
+    dropzone.addEventListener("click", function () { input.click(); });
+    input.addEventListener("change", function () {
+      if (input.files.length) readImageFile(input.files[0]);
+    });
+
+    ["dragenter", "dragover"].forEach(function (ev) {
+      dropzone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        dropzone.classList.add("drag");
+      });
+    });
+    ["dragleave", "drop"].forEach(function (ev) {
+      dropzone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        dropzone.classList.remove("drag");
+      });
+    });
+    dropzone.addEventListener("drop", function (e) {
+      var files = e.dataTransfer.files;
+      if (files && files.length) readImageFile(files[0]);
+    });
+
+    document.getElementById("photoClearBtn").addEventListener("click", function () {
+      input.value = "";
+      document.getElementById("photoResult").style.display = "none";
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    renderAll();
+    initPhotoPanel();
+  });
+})();
+</script>
+</body>
+</html>
