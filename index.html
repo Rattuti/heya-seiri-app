@@ -46,10 +46,6 @@
     background: conic-gradient(var(--score-color, var(--muted)) calc(var(--score-pct, 0) * 1%), var(--border) 0);
     flex-shrink: 0;
   }
-  .score-circle::before {
-    content: "";
-    position: absolute;
-  }
   .score-inner {
     width: 76px; height: 76px; border-radius: 50%;
     background: var(--panel);
@@ -74,13 +70,18 @@
   .cat-count { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
   .item-list { display: flex; flex-direction: column; gap: 2px; }
   .item {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; flex-direction: column; gap: 3px;
     padding: 7px 6px; border-radius: 6px;
   }
   .item:hover { background: var(--bg); }
+  .item-main { display: flex; align-items: center; gap: 10px; }
   .item input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
   .item label { cursor: pointer; flex: 1; font-size: 0.92rem; }
   .item.checked label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border); }
+  .item-search-link {
+    margin-left: 27px; font-size: 0.78rem; text-decoration: none; color: var(--accent-dark);
+  }
+  .item-search-link:hover { text-decoration: underline; }
   .item .rm {
     background: none; border: none; color: var(--muted); cursor: pointer;
     font-size: 0.85rem; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.1s;
@@ -94,11 +95,11 @@
     padding: 6px 10px;
     border: 1px solid var(--border);
     border-radius: 6px;
-    background: #fff;
+    background: var(--panel);
   }
   button { cursor: pointer; background: var(--accent); color: #fff; border: none; }
   button:hover { background: var(--accent-dark); }
-  button.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+  button.secondary { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
   .hint { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
   .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
 
@@ -121,6 +122,53 @@
   .metric-bar-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
   .metric-bar-row .bar-track { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
   .metric-bar-row .bar-fill { height: 100%; border-radius: 999px; background: var(--accent); }
+  .photo-breakdown { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .photo-breakdown-title { font-size: 0.8rem; font-weight: 600; margin: 0 0 6px; }
+  .photo-breakdown-row { display: flex; justify-content: space-between; gap: 10px; font-size: 0.78rem; color: var(--muted); padding: 2px 0; }
+  .photo-breakdown-row .bd-value { color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .photo-breakdown-row.bd-total { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 6px; font-weight: 600; color: var(--text); }
+
+  /* tips panel */
+  a { color: var(--accent-dark); }
+  details { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  details + details { margin-top: 10px; }
+  details summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; }
+  .tips-list { margin: 8px 0 0; padding-left: 18px; font-size: 0.85rem; }
+  .tips-list li { margin-bottom: 6px; }
+
+  /* tidy search */
+  #tidySearchInput { width: 100%; }
+  .tidy-location-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+  .tidy-location-row label { color: var(--muted); white-space: nowrap; }
+  .tidy-location-row select { flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 0.85rem; }
+  .tidy-location-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tidy-location-link {
+    font-size: 0.78rem; padding: 6px 12px; border-radius: 999px; text-decoration: none;
+    border: 1px solid var(--border); background: var(--panel); color: var(--accent-dark);
+  }
+  .tidy-location-link:hover { background: var(--bg); border-color: var(--accent); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    font-size: 0.78rem; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--panel); color: var(--muted); cursor: pointer;
+  }
+  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tidy-results { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+  .tidy-item { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+  .tidy-item-name { font-weight: 600; font-size: 0.88rem; }
+  .tidy-item-cat { font-size: 0.72rem; color: var(--muted); margin-left: 6px; }
+  .tidy-item-reason { font-size: 0.82rem; color: var(--muted); margin-top: 3px; }
+  .tidy-item-search { display: inline-block; margin-top: 6px; font-size: 0.78rem; text-decoration: none; }
+  .tidy-item-search:hover { text-decoration: underline; }
+  .tidy-empty { font-size: 0.85rem; color: var(--muted); padding: 10px 0; }
+
+  /* notion sync status */
+  .notion-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: var(--muted);
+    background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 12px; margin-bottom: 4px;
+  }
 </style>
 </head>
 <body>
@@ -128,6 +176,7 @@
   <div>
     <h1>お部屋整理チェッカー</h1>
     <p class="subtitle">チェックリストに沿って部屋の状態を確認すると、整理度を自動判定します(データはブラウザ内のみ・保存はされません)</p>
+    <div class="notion-status">📎 Notion反映: 2026-08-02 時点の内容(自動同期ではなく、手動で取り込んだ内容です)</div>
   </div>
 
   <div class="panel">
@@ -162,13 +211,76 @@
           <div class="bar-track"><div class="bar-fill" id="edgeBar"></div></div>
         </div>
         <div class="metric-bar-row">
+          <span>エッジ方向の乱れ</span>
+          <div class="bar-track"><div class="bar-fill" id="dirBar"></div></div>
+        </div>
+        <div class="metric-bar-row">
           <span>色・明暗のばらつき</span>
           <div class="bar-track"><div class="bar-fill" id="varBar"></div></div>
         </div>
+        <div class="photo-breakdown" id="photoBreakdown"></div>
         <button type="button" class="secondary" id="photoClearBtn" style="margin-top:10px;">写真をクリア</button>
       </div>
     </div>
     <p class="hint">写真の色・明暗の分布と輪郭の複雑さをブラウザ内で機械的に解析した目安です。実際の画像認識(物体認識)ではないため、実際の整理状態と異なる場合があります。写真は保存・送信されず、ブラウザ内の処理のみで完結します。</p>
+  </div>
+
+  <div class="panel">
+    <h2>そうじ・整理のヒント</h2>
+    <details>
+      <summary>汚れ別の落とし方(早見表)</summary>
+      <ul class="tips-list">
+        <li><strong>白い水垢・石鹸カス</strong> → 酸性(クエン酸)で溶かす。パックして放置が効果的</li>
+        <li><strong>黒ずみ・皮脂汚れ</strong> → 重曹などの弱アルカリでやさしくこする</li>
+        <li><strong>黒カビ</strong> → 塩素系をかけて放置し、流す(こすると胞子が飛ぶので注意)</li>
+        <li><strong>ヌメリ・赤カビ</strong> → 早めに中性洗剤で。放置すると黒カビの温床になる</li>
+      </ul>
+      <p class="hint" style="color:var(--bad);">⚠️ 酸性洗剤と塩素系洗剤は絶対に混ぜない(有毒ガスが発生します)</p>
+    </details>
+    <details>
+      <summary>物を減らす判断基準</summary>
+      <p class="hint" style="margin-top:6px;">「いつか使うかも」ではなく「今、実際に使っているか」だけで判断する。物が減ると掃除・管理の手間と視覚的ノイズが減り、精神的な負担も軽くなる。</p>
+    </details>
+    <details>
+      <summary>整理が得意な人の工夫(習慣)</summary>
+      <ul class="tips-list">
+        <li><strong>収納場所を先に決めてから買う</strong> — 置き場所が決まっていない物は増えやすい</li>
+        <li><strong>1つ買ったら1つ手放す</strong> — 物の総量を一定に保つルール</li>
+        <li><strong>ゴールデンゾーンを意識する</strong> — よく使う物は腰〜目線の高さ、使用頻度の低い物は奥や高い所へ</li>
+        <li><strong>透明な収納ボックスで見える化</strong> — 中身が一目でわかると管理しやすい</li>
+        <li><strong>デッドスペースを活用</strong> — ベッド下・家具の隙間・壁面を収納に使う</li>
+        <li><strong>「面」を意識して片付ける</strong> — 目につく面(棚の手前・床)から整えると全体が片付いて見える</li>
+        <li><strong>5分だけルール</strong> — やる気がない日でも5分だけ手をつけると続けやすい</li>
+        <li><strong>使ったら元の場所に戻す</strong> — リバウンド防止の基本習慣</li>
+        <li><strong>ビフォーアフターを記録する</strong> — 達成感が可視化され、キープしたくなる</li>
+      </ul>
+      <p class="hint">参考: <a href="https://kinarino.jp/cat3/17950" target="_blank" rel="noopener">片付け上手さんの整理整頓術(キナリノ)</a> / <a href="https://howsie.jp/article/19667/" target="_blank" rel="noopener">リバウンドしない片付け習慣化(ハウジーマガジン)</a></p>
+    </details>
+    <p class="hint">参考: <a href="http://as76.net/life/huro_so.php" target="_blank" rel="noopener">お風呂掃除(重曹の活用)</a> / <a href="http://lifeon.lion.co.jp/cleaning/03/01.htm" target="_blank" rel="noopener">重曹ペーストの作り方</a></p>
+  </div>
+
+  <div class="panel">
+    <h2>ものの整頓術を検索</h2>
+    <div class="tidy-location-row">
+      <label for="tidyLocationSelect">場所から探す</label>
+      <select id="tidyLocationSelect">
+        <option value="">選択してください</option>
+        <option value="リビング">リビング</option>
+        <option value="キッチン">キッチン</option>
+        <option value="クローゼット">クローゼット</option>
+        <option value="寝室">寝室</option>
+        <option value="玄関">玄関</option>
+        <option value="洗面所">洗面所</option>
+        <option value="子供部屋">子供部屋</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+    <div class="tidy-location-links" id="tidyLocationLinks"></div>
+
+    <input type="text" id="tidySearchInput" placeholder="例: キッチン、服、充電器..." style="margin-top:14px;">
+    <div class="chip-row" id="tidyCategoryChips"></div>
+    <div class="tidy-results" id="tidyResults"></div>
+    <p class="hint">「手放すか迷ったら」の判断例です。実際に手放すかはご自身の判断で。</p>
   </div>
 
   <div class="panel">
@@ -216,6 +328,22 @@
       ]
     },
     {
+      name: "キッチン・水回り",
+      items: [
+        "排水溝のぬめりを重曹+お酢で掃除した",
+        "シンク・蛇口の水垢をクエン酸で拭き取った",
+        "生ゴミ・三角コーナーを空にした"
+      ]
+    },
+    {
+      name: "お風呂・洗面所",
+      items: [
+        "浴槽の湯垢を入浴後すぐ中性洗剤で流した",
+        "鏡・蛇口の水垢をクエン酸パックで除去した",
+        "排水口・ゴムパッキンのカビ予防に換気した"
+      ]
+    },
+    {
       name: "ゴミ・洗濯物",
       items: [
         "ゴミ箱が満杯でない",
@@ -231,6 +359,53 @@
     }
   ];
 
+  // チェックリストの各項目文を、その項目を解決するための検索キーワードに
+  // 変換する対応表。DEFAULT_CATEGORIESの項目文をキーにした厳選版。
+  // (例: 「床に物が置かれていない」→「床置き 解消 収納 方法」)
+  var ITEM_SEARCH_OVERRIDES = {
+    "物が床に散らかっていない": "床置き 解消 収納 方法",
+    "掃除機・フローリングワイパーをかけた": "フローリング 掃除 コツ",
+    "ケーブル類がまとまっている": "ケーブル 収納 まとめ方",
+    "書類や文房具が整理されている": "書類 文房具 収納 整理",
+    "デスク上に不要なものがない": "デスク周り 片付け コツ",
+    "充電器・ケーブルが整理されている": "充電器 ケーブル 収納 デスク",
+    "布団・ベッドが整えられている": "布団 ベッドメイキング コツ",
+    "枕やクッションが定位置にある": "クッション 収納 定位置",
+    "服がクローゼット・タンスにしまわれている": "クローゼット 収納 コツ",
+    "収納の扉や引き出しが閉まっている": "収納 詰め込みすぎ 解消",
+    "排水溝のぬめりを重曹+お酢で掃除した": "排水溝 掃除 重曹 やり方",
+    "シンク・蛇口の水垢をクエン酸で拭き取った": "シンク 水垢 クエン酸 落とし方",
+    "生ゴミ・三角コーナーを空にした": "三角コーナー 生ゴミ 処理 コツ",
+    "浴槽の湯垢を入浴後すぐ中性洗剤で流した": "浴槽 湯垢 掃除 方法",
+    "鏡・蛇口の水垢をクエン酸パックで除去した": "鏡 水垢 クエン酸パック やり方",
+    "排水口・ゴムパッキンのカビ予防に換気した": "お風呂 カビ予防 換気 コツ",
+    "ゴミ箱が満杯でない": "ゴミ箱 収納 サイズ 選び方",
+    "洗濯物が溜まっていない(かご・洗濯機の中にある)": "洗濯物 溜まる 解消 収納",
+    "使った食器がキッチンに戻されている": "食器 収納 使ったらすぐ戻す 仕組み",
+    "窓が開けられて換気されている": "換気 コツ 生活習慣"
+  };
+
+  // 対応表にない項目(ユーザーが追加した項目)向けの簡易フォールバック。
+  // 文末の状態表現をいくつか取り除き、「収納 方法」を付け足す。
+  function buildItemSearchKeyword(text) {
+    if (ITEM_SEARCH_OVERRIDES[text]) return ITEM_SEARCH_OVERRIDES[text];
+    var core = text
+      .replace(/\([^)]*\)/g, "")
+      .replace(/(が|は|を|に|の)?(整理|整頓)?(されて|しまわれて|まとまって|閉まって|片付いて|できて|入って)?い(る|ない)$/, "")
+      .replace(/(が|は)?(な|あ)い$/, "")
+      .replace(/した$/, "")
+      .trim();
+    if (!core) core = text;
+    return core + " 収納 方法";
+  }
+
+  function googleSearchUrl(query) {
+    return "https://www.google.com/search?q=" + encodeURIComponent(query);
+  }
+  function pinterestSearchUrl(query) {
+    return "https://www.pinterest.com/search/pins/?q=" + encodeURIComponent(query);
+  }
+
   // state: array of { name, items: [{ text, checked }] }
   var state = DEFAULT_CATEGORIES.map(function (cat) {
     return {
@@ -238,6 +413,274 @@
       items: cat.items.map(function (text) { return { text: text, checked: false }; })
     };
   });
+
+  var SCORE_THRESHOLD_GREAT = 90;
+  var SCORE_THRESHOLD_GOOD = 70;
+  var SCORE_THRESHOLD_WARN = 50;
+
+  var PHOTO_THRESHOLD_TIDY = 75;
+  var PHOTO_THRESHOLD_OK = 55;
+  var PHOTO_THRESHOLD_MESSY = 35;
+
+  var PHOTO_ANALYSIS_MAX_WIDTH = 240;
+  var EDGE_DETECTION_THRESHOLD = 40;
+  var EDGE_DENSITY_NORMALIZATION_MAX = 0.25;
+  var VARIANCE_GRID_SIZE = 8;
+  var VARIANCE_NORMALIZATION_MAX = 60;
+  var EDGE_DENSITY_WEIGHT = 0.6;
+  var VARIANCE_WEIGHT = 0.4;
+  // 画像下半分(床が写りやすい領域)の寄与を底上げする倍率。整った本棚などが
+  // 上半分に写っていても、実際に散らかりやすい床面の状態をより強く反映する。
+  var BOTTOM_REGION_WEIGHT = 2;
+  // Sobelで求めたエッジ方向を分類するヒストグラムのビン数(180度を8分割)。
+  var DIRECTION_BIN_COUNT = 8;
+  // エッジ方向が揃っている(=整然としている)ほど、エッジ密度による減点を
+  // 緩和する強さ。1.0で最大時に減点を全額相殺、0で緩和なし(従来の挙動)。
+  var DIRECTION_MITIGATION_STRENGTH = 0.5;
+
+  var TIDY_RESULT_LIMIT = 30;
+
+  // ---------- Tidying tips search (curated, local data, no network) ----------
+  var TIDYING_TIPS = [
+    { category: "玄関・外回り", item: "玄関マット", reason: "掃除が面倒であり、埃や菌の温床となりやすいため。" },
+    { category: "玄関・外回り", item: "大量の靴", reason: "湿気や匂いの原因となり、収納スペースを圧迫するため。" },
+    { category: "玄関・外回り", item: "ビニール傘", reason: "壊れやすく、折りたたみ傘で代替可能なため。" },
+    { category: "玄関・外回り", item: "大きな傘立て", reason: "不要な傘を溜め込み、玄関を狭くする原因になるため。" },
+    { category: "玄関・外回り", item: "玄関の置き物", reason: "埃が溜まりやすく、掃除の手間を増やすため。" },
+    { category: "玄関・外回り", item: "芳香剤・消臭剤", reason: "定期的な洗浄や換気の方が、根本的な匂い対策として効果的であるため。" },
+    { category: "玄関・外回り", item: "レジャー用サンダル", reason: "実際の使用頻度が年に数回と極端に低い場合が多いため。" },
+
+    { category: "キッチン・食事関連", item: "キッチンマット", reason: "汚れを吸収しやすく、洗濯が面倒なため。" },
+    { category: "キッチン・食事関連", item: "トースター", reason: "パンはフライパンでも焼くことが可能であるため。" },
+    { category: "キッチン・食事関連", item: "三角コーナー", reason: "生ゴミの匂いやぬめりの発生源となるため。" },
+    { category: "キッチン・食事関連", item: "無駄な調理器具", reason: "高度な専用器具は、実際には置き物と化していることが多いため。" },
+    { category: "キッチン・食事関連", item: "多すぎるタッパー", reason: "数を持ちすぎると収納を圧迫する。必要な数に絞るべき。" },
+    { category: "キッチン・食事関連", item: "無駄な食器", reason: "家族の人数分と基本的な用途別のものがあれば十分であるため。" },
+    { category: "キッチン・食事関連", item: "お客様用の食器", reason: "来客の頻度が極端に低い場合、不要であるため。" },
+    { category: "キッチン・食事関連", item: "使い捨ての箸やスプーン", reason: "必要な時に都度もらうことでストックをなくせるため。" },
+    { category: "キッチン・食事関連", item: "大量のビニール袋", reason: "引き出しを占領しがちであり、管理が煩雑になるため。" },
+    { category: "キッチン・食事関連", item: "キッチンタオルのストック", reason: "洗濯物はキッチンペーパーで代用可能であるため。" },
+    { category: "キッチン・食事関連", item: "食器拭き専用の布巾", reason: "自然乾燥とキッチンペーパーで十分対応できるため。" },
+    { category: "キッチン・食事関連", item: "鍋セット", reason: "鍋を囲む機会がなければ不要であるため。" },
+    { category: "キッチン・食事関連", item: "計量カップ", reason: "計量スプーンで代用可能であるため。" },
+    { category: "キッチン・食事関連", item: "エプロン", reason: "汚れてもいい部屋着に着替えるという選択肢があるため。" },
+    { category: "キッチン・食事関連", item: "お菓子作りセット", reason: "作る習慣がない場合は不要であるため。" },
+    { category: "キッチン・食事関連", item: "ホームパーティー用品", reason: "たこ焼き器など、使用頻度に応じて保有を検討すべき。" },
+    { category: "キッチン・食事関連", item: "ランチョンマットや箸置き", reason: "おしゃれさを追求しないのであれば不要であるため。" },
+
+    { category: "バスルーム・洗面所", item: "バスマット", reason: "足はタオルで拭けば十分であり、洗濯の手間が省けるため。" },
+    { category: "バスルーム・洗面所", item: "風呂椅子・風呂桶", reason: "シャワーで済ませる習慣があれば不要であるため。" },
+    { category: "バスルーム・洗面所", item: "体を洗うタオル", reason: "雑菌の温床になりやすく、手で洗うことで代替できるため。" },
+    { category: "バスルーム・洗面所", item: "お風呂用洗剤", reason: "ボディソープなどで代用可能な場合があるため。" },
+    { category: "バスルーム・洗面所", item: "お風呂掃除用スリッパ", reason: "水で濡れて不衛生になりやすいため。" },
+    { category: "バスルーム・洗面所", item: "大判のバスタオル", reason: "小さなタオルで代用すれば、洗濯が楽になるため。" },
+    { category: "バスルーム・洗面所", item: "バスローブ", reason: "湯船に長く浸からないライフスタイルの場合、不要であるため。" },
+    { category: "バスルーム・洗面所", item: "複数の浴室用小物ラック", reason: "ぬめりやカビの温床になりやすいため。" },
+    { category: "バスルーム・洗面所", item: "トイレマット・カバー", reason: "埃や匂いを吸着しやすく、衛生面でのデメリットが大きいため。" },
+    { category: "バスルーム・洗面所", item: "トイレ用スリッパ", reason: "不衛生になりやすく、場所を取るため。" },
+    { category: "バスルーム・洗面所", item: "普通巻きトイレットペーパー", reason: "2倍巻きタイプの方が交換頻度が減り、効率的であるため。" },
+    { category: "バスルーム・洗面所", item: "洗顔料", reason: "肌質によっては、ぬるま湯洗顔で十分な場合があるため。" },
+    { category: "バスルーム・洗面所", item: "化粧水や乳液", reason: "オールインワン製品で代替可能であるため。" },
+    { category: "バスルーム・洗面所", item: "美容グッズ", reason: "効果が不明なものはスペースの無駄であるため。" },
+    { category: "バスルーム・洗面所", item: "歯磨き用コップ", reason: "手で水をすくって口をゆすげば不要であるため。" },
+    { category: "バスルーム・洗面所", item: "使い切っていないサンプル品", reason: "使用期限切れになりがちなため、溜め込まずに処分する。" },
+
+    { category: "リビング・寝室", item: "ローテーブル", reason: "座りっぱなしの姿勢は腰に負担をかけるため。" },
+    { category: "リビング・寝室", item: "ソファー", reason: "部屋に圧迫感を与え、ベッドで代用できる場合があるため。" },
+    { category: "リビング・寝室", item: "ラグ・膝掛け・毛布", reason: "埃やダニの温床となり、掃除の手間が増えるため。" },
+    { category: "リビング・寝室", item: "追加の収納家具", reason: "物自体を減らせば、備え付けの収納で十分になるため。" },
+    { category: "リビング・寝室", item: "カレンダー・時計", reason: "スマートフォンやPCで管理・確認できるため。" },
+    { category: "リビング・寝室", item: "加湿器・空気清浄機", reason: "メンテナンスが大変であり、本当に必要か見直すべき。" },
+    { category: "リビング・寝室", item: "大型の掃除機", reason: "ワンルームなどでは小型クリーナーで十分な場合があるため。" },
+    { category: "リビング・寝室", item: "埃取りモップ", reason: "キッチンペーパーで代用可能であるため。" },
+    { category: "リビング・寝室", item: "冬用スリッパ", reason: "湿気がこもり、不衛生になりやすいため。" },
+    { category: "リビング・寝室", item: "複数のリビング用ゴミ箱", reason: "ワンルームなら1つで十分。ゴミ出しの手間を減らせるため。" },
+    { category: "リビング・寝室", item: "飾りクッション", reason: "場所を取り、掃除の手間を増やすだけの場合が多いため。" },
+    { category: "リビング・寝室", item: "複数のベッドサイドトレー", reason: "埃が溜まる原因になるため、1つに絞るべき。" },
+
+    { category: "書類・本関連", item: "再読しない本", reason: "読み返さないのであれば、売却や寄付を検討する。" },
+    { category: "書類・本関連", item: "雑誌", reason: "必要な情報はオンラインで入手可能であるため。" },
+    { category: "書類・本関連", item: "不要なレシート", reason: "家計簿アプリなどでデジタル管理すれば不要になるため。" },
+    { category: "書類・本関連", item: "不要な書類の束", reason: "紙で残す必要のないものはスキャンしてデジタル化する。" },
+    { category: "書類・本関連", item: "紙袋の大量ストック", reason: "実際に人に物を渡す機会は想定より少ないため。" },
+    { category: "書類・本関連", item: "振り返らない思い出の写真", reason: "データ化して保存することで、物理的なスペースを削減できる。" },
+    { category: "書類・本関連", item: "古いノートや手帳", reason: "必要な情報だけをデジタル化し、本体は処分する。" },
+    { category: "書類・本関連", item: "古いファイル", reason: "中身を見直し、不要な書類と共に処分する。" },
+
+    { category: "小物・ファッション雑貨", item: "長財布", reason: "キャッシュレス化が進む現代では、ミニ財布で十分なため。" },
+    { category: "小物・ファッション雑貨", item: "ポイントカード", reason: "アプリで管理できるものはカード自体を処分する。" },
+    { category: "小物・ファッション雑貨", item: "文房具の過剰ストック", reason: "ボールペンなら1〜2本あれば十分であり、予備は不要。" },
+    { category: "小物・ファッション雑貨", item: "予備のボタン", reason: "数年間使わなかったのであれば、今後も使う可能性は低い。" },
+    { category: "小物・ファッション雑貨", item: "使わないバッグ", reason: "1年以上使っていないものは手放すことを検討する。" },
+    { category: "小物・ファッション雑貨", item: "使わないアクセサリー", reason: "本当に気に入っている数点に厳選する。" },
+    { category: "小物・ファッション雑貨", item: "複数の香水", reason: "使い切る前に香りが劣化する可能性があるため。" },
+    { category: "小物・ファッション雑貨", item: "似合わないサングラスや帽子", reason: "現実的に使わないのであれば処分する。" },
+    { category: "小物・ファッション雑貨", item: "使わないブランド品", reason: "資金化して有効活用することを検討する。" },
+
+    { category: "衣類", item: "1年間着ていない服", reason: "1年間出番がなかった時点で、今後も着る可能性は低い。" },
+    { category: "衣類", item: "サイズが合わない服", reason: "「痩せたら着る」という希望的観測で保管するのは非現実的。" },
+    { category: "衣類", item: "トレンドが過ぎた服", reason: "流行が再来しても、デザインが古臭く見えることが多い。" },
+    { category: "衣類", item: "今の好みに合わない服", reason: "無理して残す必要はない。" },
+    { category: "衣類", item: "重くて着づらいアウター", reason: "着用頻度が低いなら、クローゼットのスペースの無駄。" },
+    { category: "衣類", item: "ボトムスの過剰なバリエーション", reason: "実際には気に入ったものを繰り返し履くことが多い。" },
+    { category: "衣類", item: "季節限定素材の服", reason: "着用期間が短く、保管期間が長いため、費用対効果が低い。" },
+    { category: "衣類", item: "着心地が悪い服", reason: "首元が苦しいなど、不快な要素がある服は手放す。" },
+    { category: "衣類", item: "靴下や下着の過剰ストック", reason: "消耗品は、買い替えのサイクルに合わせて必要分だけ持つ。" },
+    { category: "衣類", item: "必要以上の防寒具", reason: "室内生活が中心なら、最小限に抑えることができる。" },
+    { category: "衣類", item: "複数の水着", reason: "実際に使う頻度は極めて低い場合が多い。" },
+
+    { category: "家電・ガジェット系", item: "テレビ", reason: "PCやタブレットで動画コンテンツを視聴でき、代替可能。" },
+    { category: "家電・ガジェット系", item: "古いスマホやタブレット", reason: "予備として保管していても、実際に使うことはほとんどない。" },
+    { category: "家電・ガジェット系", item: "壊れた家電", reason: "高価だったとしても、壊れている時点で使用価値はない。" },
+    { category: "家電・ガジェット系", item: "使っていないPC周辺機器", reason: "場所を取り、年々型落ちしていくため。" },
+    { category: "家電・ガジェット系", item: "重複する充電器", reason: "実際に使うのは1つか2つであるため。" },
+    { category: "家電・ガジェット系", item: "古いメモリカードやUSBメモリ", reason: "より大容量で便利なものが安価で手に入るため。" },
+    { category: "家電・ガジェット系", item: "不要なスマホアプリ", reason: "使わないアプリは削除し、ストレージと動作を軽くする。" },
+    { category: "家電・ガジェット系", item: "用途不明のコード類", reason: "使い道が分からないものは、今後も使う可能性がない。" },
+
+    { category: "趣味・レジャー用品", item: "過去の趣味グッズ", reason: "再開する具体的な予定がないなら、場所の無駄。" },
+    { category: "趣味・レジャー用品", item: "やりたかっただけの趣味道具", reason: "結局やらなかったのであれば、今後も使わない可能性が高い。" },
+    { category: "趣味・レジャー用品", item: "旅行用アイテム", reason: "使用頻度が低いなら、スーツケースなどはレンタルで対応可能。" },
+    { category: "趣味・レジャー用品", item: "商品の空箱", reason: "売却予定がない限り、保管しておく意味はない。" },
+    { category: "趣味・レジャー用品", item: "使わないスポーツ用品", reason: "年1回以下の使用頻度なら、レンタルの方が合理的。" },
+    { category: "趣味・レジャー用品", item: "使っていないDIY工具", reason: "必要な時にレンタルサービスを利用できる。" },
+    { category: "趣味・レジャー用品", item: "遊んでいないゲーム機やソフト", reason: "プレイしていないのであれば手放すことを検討する。" }
+  ];
+
+  function matchesTidyQuery(tip, query) {
+    return tip.item.toLowerCase().indexOf(query) !== -1 ||
+      tip.category.toLowerCase().indexOf(query) !== -1 ||
+      tip.reason.toLowerCase().indexOf(query) !== -1;
+  }
+
+  function createTidyResultItem(tip) {
+    var el = document.createElement("div");
+    el.className = "tidy-item";
+
+    var nameRow = document.createElement("div");
+    var nameSpan = document.createElement("span");
+    nameSpan.className = "tidy-item-name";
+    nameSpan.textContent = tip.item;
+    var catSpan = document.createElement("span");
+    catSpan.className = "tidy-item-cat";
+    catSpan.textContent = tip.category;
+    nameRow.appendChild(nameSpan);
+    nameRow.appendChild(catSpan);
+
+    var reasonDiv = document.createElement("div");
+    reasonDiv.className = "tidy-item-reason";
+    reasonDiv.textContent = tip.reason;
+
+    var searchLink = document.createElement("a");
+    searchLink.className = "tidy-item-search";
+    searchLink.href = "https://www.google.com/search?q=" + encodeURIComponent(tip.item + " 収納 整理 アイデア");
+    searchLink.target = "_blank";
+    searchLink.rel = "noopener";
+    searchLink.textContent = "🔍 収納・整理のアイデアを検索";
+
+    el.appendChild(nameRow);
+    el.appendChild(reasonDiv);
+    el.appendChild(searchLink);
+    return el;
+  }
+
+  function renderTidyResults(rawQuery, activeCategory) {
+    var query = (rawQuery || "").trim().toLowerCase();
+    var container = document.getElementById("tidyResults");
+    container.innerHTML = "";
+
+    if (!query && !activeCategory) {
+      var hint = document.createElement("div");
+      hint.className = "tidy-empty";
+      hint.textContent = "キーワードを入力するか、カテゴリを選ぶと候補が表示されます";
+      container.appendChild(hint);
+      return;
+    }
+
+    var results = TIDYING_TIPS.filter(function (tip) {
+      if (activeCategory && tip.category !== activeCategory) return false;
+      if (query && !matchesTidyQuery(tip, query)) return false;
+      return true;
+    });
+
+    if (results.length === 0) {
+      var empty = document.createElement("div");
+      empty.className = "tidy-empty";
+      empty.textContent = "該当する項目が見つかりませんでした";
+      container.appendChild(empty);
+      return;
+    }
+
+    results.slice(0, TIDY_RESULT_LIMIT).forEach(function (tip) {
+      container.appendChild(createTidyResultItem(tip));
+    });
+
+    if (results.length > TIDY_RESULT_LIMIT) {
+      var more = document.createElement("div");
+      more.className = "tidy-empty";
+      more.textContent = "他 " + (results.length - TIDY_RESULT_LIMIT) + " 件は絞り込んで表示してください";
+      container.appendChild(more);
+    }
+  }
+
+  function initTidySearch() {
+    var input = document.getElementById("tidySearchInput");
+    var chipsContainer = document.getElementById("tidyCategoryChips");
+    var activeCategory = null;
+    var categories = [];
+    TIDYING_TIPS.forEach(function (tip) {
+      if (categories.indexOf(tip.category) === -1) categories.push(tip.category);
+    });
+
+    categories.forEach(function (cat) {
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = cat;
+      chip.addEventListener("click", function () {
+        activeCategory = activeCategory === cat ? null : cat;
+        Array.prototype.forEach.call(chipsContainer.children, function (c) {
+          c.classList.toggle("active", c === chip && activeCategory === cat);
+        });
+        renderTidyResults(input.value, activeCategory);
+      });
+      chipsContainer.appendChild(chip);
+    });
+
+    input.addEventListener("input", function () {
+      renderTidyResults(input.value, activeCategory);
+    });
+
+    renderTidyResults("", null);
+  }
+
+  function buildLocationLink(container, label, url) {
+    var a = document.createElement("a");
+    a.className = "tidy-location-link";
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = label;
+    container.appendChild(a);
+  }
+
+  function renderLocationLinks(location) {
+    var container = document.getElementById("tidyLocationLinks");
+    container.innerHTML = "";
+    if (!location) return;
+    var ideaKeyword = location + " 収納 アイデア";
+    var productKeyword = location + " 収納用品 (ニトリ OR 無印良品 OR IKEA)";
+    buildLocationLink(container, "🔍 " + location + "の収納アイデア(Google)", googleSearchUrl(ideaKeyword));
+    buildLocationLink(container, "🖼 " + location + "の収納アイデア(Pinterest)", pinterestSearchUrl(ideaKeyword));
+    buildLocationLink(container, "🛒 " + location + "の収納用品(ニトリ/無印/IKEA)", googleSearchUrl(productKeyword));
+  }
+
+  function initLocationSearch() {
+    var select = document.getElementById("tidyLocationSelect");
+    select.addEventListener("change", function () {
+      renderLocationLinks(select.value);
+    });
+  }
 
   function totalCounts() {
     var total = 0, checked = 0;
@@ -251,21 +694,21 @@
   }
 
   function scoreColor(pct) {
-    if (pct >= 90) return getVar("--great");
-    if (pct >= 70) return getVar("--good");
-    if (pct >= 50) return getVar("--warn");
-    return getVar("--bad");
+    if (pct >= SCORE_THRESHOLD_GREAT) return getCssVar("--great");
+    if (pct >= SCORE_THRESHOLD_GOOD) return getCssVar("--good");
+    if (pct >= SCORE_THRESHOLD_WARN) return getCssVar("--warn");
+    return getCssVar("--bad");
   }
 
-  function getVar(name) {
+  function getCssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   function verdictText(pct, total) {
     if (total === 0) return "チェック項目がありません";
-    if (pct >= 90) return "完璧に整理されています ✓";
-    if (pct >= 70) return "おおむね整理されています";
-    if (pct >= 50) return "少し片付けが必要です";
+    if (pct >= SCORE_THRESHOLD_GREAT) return "完璧に整理されています ✓";
+    if (pct >= SCORE_THRESHOLD_GOOD) return "おおむね整理されています";
+    if (pct >= SCORE_THRESHOLD_WARN) return "少し片付けが必要です";
     if (pct > 0) return "片付けが必要です";
     return "まずはチェックを始めましょう";
   }
@@ -290,86 +733,113 @@
 
       var list = document.createElement("div");
       list.className = "item-list";
-
       cat.items.forEach(function (item, itemIdx) {
-        var row = document.createElement("div");
-        row.className = "item" + (item.checked ? " checked" : "");
-
-        var cb = document.createElement("input");
-        cb.type = "checkbox";
-        var cbId = "chk-" + catIdx + "-" + itemIdx;
-        cb.id = cbId;
-        cb.checked = item.checked;
-        cb.addEventListener("change", function () {
-          item.checked = cb.checked;
-          renderAll();
-        });
-
-        var label = document.createElement("label");
-        label.htmlFor = cbId;
-        label.textContent = item.text;
-
-        var rm = document.createElement("button");
-        rm.type = "button";
-        rm.className = "rm";
-        rm.textContent = "削除";
-        rm.addEventListener("click", function () {
-          cat.items.splice(itemIdx, 1);
-          renderAll();
-        });
-
-        row.appendChild(cb);
-        row.appendChild(label);
-        row.appendChild(rm);
-        list.appendChild(row);
+        list.appendChild(createChecklistItemRow(cat, catIdx, item, itemIdx));
       });
-
       block.appendChild(list);
 
-      var addRow = document.createElement("div");
-      addRow.className = "add-row";
-      var input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = "項目を追加(例: 本棚を整頓した)";
-      input.style.flex = "1";
-      var addBtn = document.createElement("button");
-      addBtn.type = "button";
-      addBtn.className = "secondary";
-      addBtn.textContent = "追加";
-      function addItem() {
-        var text = input.value.trim();
-        if (!text) return;
-        cat.items.push({ text: text, checked: false });
-        input.value = "";
-        renderAll();
-      }
-      addBtn.addEventListener("click", addItem);
-      input.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") addItem();
-      });
-      addRow.appendChild(input);
-      addRow.appendChild(addBtn);
-      block.appendChild(addRow);
+      block.appendChild(createAddItemRow(cat));
 
       container.appendChild(block);
     });
   }
 
+  function createChecklistItemRow(cat, catIdx, item, itemIdx) {
+    var row = document.createElement("div");
+    row.className = "item" + (item.checked ? " checked" : "");
+
+    var main = document.createElement("div");
+    main.className = "item-main";
+
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    var cbId = "chk-" + catIdx + "-" + itemIdx;
+    cb.id = cbId;
+    cb.checked = item.checked;
+    cb.addEventListener("change", function () {
+      item.checked = cb.checked;
+      renderAll();
+    });
+
+    var label = document.createElement("label");
+    label.htmlFor = cbId;
+    label.textContent = item.text;
+
+    var rm = document.createElement("button");
+    rm.type = "button";
+    rm.className = "rm";
+    rm.textContent = "削除";
+    rm.addEventListener("click", function () {
+      cat.items.splice(itemIdx, 1);
+      renderAll();
+    });
+
+    main.appendChild(cb);
+    main.appendChild(label);
+    main.appendChild(rm);
+    row.appendChild(main);
+
+    if (!item.checked) {
+      var searchLink = document.createElement("a");
+      searchLink.className = "item-search-link";
+      searchLink.href = googleSearchUrl(buildItemSearchKeyword(item.text));
+      searchLink.target = "_blank";
+      searchLink.rel = "noopener noreferrer";
+      searchLink.textContent = "🔍 解決のヒントを検索";
+      row.appendChild(searchLink);
+    }
+
+    return row;
+  }
+
+  function createAddItemRow(cat) {
+    var addRow = document.createElement("div");
+    addRow.className = "add-row";
+    var input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "項目を追加(例: 本棚を整頓した)";
+    input.style.flex = "1";
+    var addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "secondary";
+    addBtn.textContent = "追加";
+    function addItem() {
+      var text = input.value.trim();
+      if (!text) return;
+      cat.items.push({ text: text, checked: false });
+      input.value = "";
+      renderAll();
+    }
+    addBtn.addEventListener("click", addItem);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") addItem();
+    });
+    addRow.appendChild(input);
+    addRow.appendChild(addBtn);
+    return addRow;
+  }
+
   function renderScore() {
-    var counts = totalCounts();
+    renderScoreSummary(totalCounts());
+    renderCategoryProgress();
+  }
+
+  function renderScoreSummary(counts) {
     var pct = counts.total > 0 ? Math.round((counts.checked / counts.total) * 100) : 0;
     var color = scoreColor(pct);
 
     var circle = document.getElementById("scoreCircle");
     circle.style.setProperty("--score-pct", pct);
     circle.style.setProperty("--score-color", color);
-    circle.style.position = "relative";
 
     document.getElementById("scorePct").textContent = pct + "%";
-    document.getElementById("scoreVerdict").textContent = verdictText(pct, counts.total);
-    document.getElementById("scoreVerdict").style.color = counts.total ? color : "";
+    var verdictEl = document.getElementById("scoreVerdict");
+    verdictEl.textContent = verdictText(pct, counts.total);
+    verdictEl.style.color = counts.total ? color : "";
     document.getElementById("scoreSub").textContent = counts.checked + " / " + counts.total + " 項目 完了";
+  }
 
+  function renderCategoryProgress() {
     var list = document.getElementById("catProgressList");
     list.innerHTML = "";
     state.forEach(function (cat) {
@@ -416,50 +886,83 @@
 
   // ---------- Photo analysis (local heuristic, no network/AI) ----------
   function photoVerdictText(score) {
-    if (score >= 75) return "きれいに片付いていそうです";
-    if (score >= 55) return "おおむね整理されていそうです";
-    if (score >= 35) return "やや散らかっていそうです";
+    if (score >= PHOTO_THRESHOLD_TIDY) return "きれいに片付いていそうです";
+    if (score >= PHOTO_THRESHOLD_OK) return "おおむね整理されていそうです";
+    if (score >= PHOTO_THRESHOLD_MESSY) return "やや散らかっていそうです";
     return "かなり散らかっていそうです";
   }
 
-  function analyzePhoto(img, dataUrl) {
-    var maxW = 240;
-    var scale = Math.min(1, maxW / img.width);
-    var w = Math.max(1, Math.round(img.width * scale));
-    var h = Math.max(1, Math.round(img.height * scale));
-    var canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    var ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, w, h);
-    var data = ctx.getImageData(0, 0, w, h).data;
-
-    var gray = new Float32Array(w * h);
+  function toGrayscale(imageData) {
+    var data = imageData.data;
+    var gray = new Float32Array(data.length / 4);
     for (var i = 0, p = 0; i < data.length; i += 4, p++) {
       gray[p] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
     }
+    return gray;
+  }
 
-    // edge density: simple gradient-magnitude edge detection
-    var edgeCount = 0, totalInner = 0;
-    var threshold = 40;
+  // y座標が画像下半分にあるかどうかで重みを返す(床が写りやすい下半分を
+  // BOTTOM_REGION_WEIGHT倍に底上げする)。
+  function regionWeight(y, h) {
+    return y >= h / 2 ? BOTTOM_REGION_WEIGHT : 1;
+  }
+
+  // Sobelフィルタでエッジの強さ(勾配の大きさ)と向き(勾配の角度)を算出する。
+  // 単純な差分より3x3近傍を使う分、方向の推定が安定する。
+  // 画像を上下に分割し下半分の寄与を重み付けしたうえで、
+  //   - edgeDensityNormalized: 輪郭の量(0〜1)
+  //   - directionDisorder: エッジ方向のばらつき(0=方向が揃っている/整然、
+  //     1=方向がバラバラ)。方向を8方向のヒストグラムにし、その正規化
+  //     エントロピーとして求める(本棚のように水平・垂直に揃った輪郭が多いと
+  //     特定の方向に偏り、値が小さくなる)。
+  // をまとめて1回の走査で計算する。
+  function analyzeEdges(gray, w, h) {
+    var histogram = new Array(DIRECTION_BIN_COUNT).fill(0);
+    var edgeWeightSum = 0, totalWeightSum = 0;
+    var binWidth = 180 / DIRECTION_BIN_COUNT;
     for (var y = 1; y < h - 1; y++) {
+      var weight = regionWeight(y, h);
       for (var x = 1; x < w - 1; x++) {
-        var idx = y * w + x;
-        var gx = gray[idx - 1] - gray[idx + 1];
-        var gy = gray[idx - w] - gray[idx + w];
+        var tl = gray[(y - 1) * w + (x - 1)], tm = gray[(y - 1) * w + x], tr = gray[(y - 1) * w + (x + 1)];
+        var ml = gray[y * w + (x - 1)], mr = gray[y * w + (x + 1)];
+        var bl = gray[(y + 1) * w + (x - 1)], bm = gray[(y + 1) * w + x], br = gray[(y + 1) * w + (x + 1)];
+        var gx = (tr + 2 * mr + br) - (tl + 2 * ml + bl);
+        var gy = (bl + 2 * bm + br) - (tl + 2 * tm + tr);
         var mag = Math.sqrt(gx * gx + gy * gy);
-        totalInner++;
-        if (mag > threshold) edgeCount++;
+        totalWeightSum += weight;
+        if (mag > EDGE_DETECTION_THRESHOLD) {
+          edgeWeightSum += weight;
+          // 勾配角度を線の向き(0〜180度、水平/垂直などの向き)に畳み込む。
+          var angleDeg = Math.atan2(gy, gx) * 180 / Math.PI;
+          if (angleDeg < 0) angleDeg += 180;
+          else if (angleDeg >= 180) angleDeg -= 180;
+          var bin = Math.min(DIRECTION_BIN_COUNT - 1, Math.floor(angleDeg / binWidth));
+          histogram[bin] += weight;
+        }
       }
     }
-    var edgeDensity = totalInner > 0 ? edgeCount / totalInner : 0;
-    var edgeDensityNormalized = Math.min(1, edgeDensity / 0.25);
+    var edgeDensity = totalWeightSum > 0 ? edgeWeightSum / totalWeightSum : 0;
+    var edgeDensityNormalized = Math.min(1, edgeDensity / EDGE_DENSITY_NORMALIZATION_MAX);
 
-    // block variance: texture/color busyness across an 8x8 grid
-    var gridSize = 8;
-    var blockW = Math.max(1, Math.floor(w / gridSize));
-    var blockH = Math.max(1, Math.floor(h / gridSize));
-    var stdSum = 0, blockCount = 0;
+    var directionDisorder = 0;
+    if (edgeWeightSum > 0) {
+      var entropy = 0;
+      for (var i = 0; i < DIRECTION_BIN_COUNT; i++) {
+        var p = histogram[i] / edgeWeightSum;
+        if (p > 0) entropy -= p * Math.log2(p);
+      }
+      directionDisorder = entropy / Math.log2(DIRECTION_BIN_COUNT);
+    }
+    return { edgeDensityNormalized: edgeDensityNormalized, directionDisorder: directionDisorder };
+  }
+
+  // texture/color busyness: average brightness std-dev across a grid of blocks
+  function computeColorVariance(gray, w, h) {
+    var blockW = Math.max(1, Math.floor(w / VARIANCE_GRID_SIZE));
+    var blockH = Math.max(1, Math.floor(h / VARIANCE_GRID_SIZE));
+    var weightedStdSum = 0, weightSum = 0;
     for (var by = 0; by < h; by += blockH) {
+      var weight = regionWeight(by + blockH / 2, h);
       for (var bx = 0; bx < w; bx += blockW) {
         var sum = 0, sumSq = 0, n = 0;
         for (var yy = by; yy < Math.min(h, by + blockH); yy++) {
@@ -471,34 +974,96 @@
         if (n > 0) {
           var mean = sum / n;
           var variance = sumSq / n - mean * mean;
-          stdSum += Math.sqrt(Math.max(0, variance));
-          blockCount++;
+          weightedStdSum += Math.sqrt(Math.max(0, variance)) * weight;
+          weightSum += weight;
         }
       }
     }
-    var avgBlockStd = blockCount > 0 ? stdSum / blockCount : 0;
-    var varianceNormalized = Math.min(1, avgBlockStd / 60);
-
-    var clutterScore = Math.round((0.6 * edgeDensityNormalized + 0.4 * varianceNormalized) * 100);
-    var tidinessScore = Math.max(0, Math.min(100, 100 - clutterScore));
-
-    renderPhotoResult(dataUrl, tidinessScore, edgeDensityNormalized, varianceNormalized);
+    var avgBlockStd = weightSum > 0 ? weightedStdSum / weightSum : 0;
+    return Math.min(1, avgBlockStd / VARIANCE_NORMALIZATION_MAX);
   }
 
-  function renderPhotoResult(dataUrl, score, edgeNorm, varNorm) {
+  function analyzePhoto(img, dataUrl) {
+    var scale = Math.min(1, PHOTO_ANALYSIS_MAX_WIDTH / img.width);
+    var w = Math.max(1, Math.round(img.width * scale));
+    var h = Math.max(1, Math.round(img.height * scale));
+    var canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, w, h);
+    var gray = toGrayscale(ctx.getImageData(0, 0, w, h));
+
+    var edgeAnalysis = analyzeEdges(gray, w, h);
+    var edgeDensityNormalized = edgeAnalysis.edgeDensityNormalized;
+    var directionDisorder = edgeAnalysis.directionDisorder;
+    var varianceNormalized = computeColorVariance(gray, w, h);
+
+    // エッジ密度・輝度のばらつきの2成分は満点100点換算でそれぞれ加点し、
+    // エッジ方向が揃っている(directionDisorderが小さい=整然)ほど、
+    // エッジ密度による加点をDIRECTION_MITIGATION_STRENGTH分まで緩和する。
+    // 整然と並んだ本棚のように輪郭は多いが方向が揃っている場合、
+    // 従来より低い散らかりスコアになる。
+    var rawEdgeComponent = EDGE_DENSITY_WEIGHT * edgeDensityNormalized * 100;
+    var concentration = 1 - directionDisorder;
+    var mitigation = rawEdgeComponent * DIRECTION_MITIGATION_STRENGTH * concentration;
+    var effectiveEdgeComponent = rawEdgeComponent - mitigation;
+    var varComponent = VARIANCE_WEIGHT * varianceNormalized * 100;
+
+    var clutterScore = Math.round(effectiveEdgeComponent + varComponent);
+    clutterScore = Math.max(0, Math.min(100, clutterScore));
+    var tidinessScore = 100 - clutterScore;
+
+    renderPhotoResult(dataUrl, tidinessScore, {
+      edgeDensityNormalized: edgeDensityNormalized,
+      directionDisorder: directionDisorder,
+      varianceNormalized: varianceNormalized,
+      rawEdgeComponent: rawEdgeComponent,
+      mitigation: mitigation,
+      varComponent: varComponent,
+      clutterScore: clutterScore
+    });
+  }
+
+  function buildPhotoBreakdown(container, b) {
+    container.innerHTML = "";
+    var title = document.createElement("p");
+    title.className = "photo-breakdown-title";
+    title.textContent = "散らかり度スコアの内訳(0〜100、高いほど散らかり)";
+    container.appendChild(title);
+
+    function bdRow(label, value, max, cls) {
+      var row = document.createElement("div");
+      row.className = "photo-breakdown-row" + (cls ? " " + cls : "");
+      var l = document.createElement("span"); l.textContent = label;
+      var v = document.createElement("span"); v.className = "bd-value";
+      v.textContent = Math.round(value) + " / " + max;
+      row.appendChild(l); row.appendChild(v);
+      container.appendChild(row);
+    }
+    bdRow("輪郭(エッジ)密度による加点(満点" + Math.round(EDGE_DENSITY_WEIGHT * 100) + ")", b.rawEdgeComponent, Math.round(EDGE_DENSITY_WEIGHT * 100));
+    bdRow("エッジ方向の整然さによる緩和(最大-" + Math.round(EDGE_DENSITY_WEIGHT * 100 * DIRECTION_MITIGATION_STRENGTH) + ")", -b.mitigation, "-" + Math.round(EDGE_DENSITY_WEIGHT * 100 * DIRECTION_MITIGATION_STRENGTH));
+    bdRow("色・明暗のばらつきによる加点(満点" + Math.round(VARIANCE_WEIGHT * 100) + ")", b.varComponent, Math.round(VARIANCE_WEIGHT * 100));
+    bdRow("散らかり度合計(整理度 = 100 - この値)", b.clutterScore, 100, "bd-total");
+  }
+
+  function renderPhotoResult(dataUrl, score, m) {
     document.getElementById("photoResult").style.display = "flex";
     document.getElementById("photoThumb").src = dataUrl;
     var color = scoreColor(score);
     var verdictEl = document.getElementById("photoVerdict");
     verdictEl.textContent = photoVerdictText(score) + "(推定 " + score + " 点)";
     verdictEl.style.color = color;
-    document.getElementById("photoScoreSub").textContent = "輪郭密度と色・明暗のばらつきから算出した参考値です";
+    document.getElementById("photoScoreSub").textContent = "輪郭密度・輪郭方向の整然さ・色や明暗のばらつきから算出した参考値です(床が写る下半分を重視)";
     var edgeBar = document.getElementById("edgeBar");
-    edgeBar.style.width = Math.round(edgeNorm * 100) + "%";
+    edgeBar.style.width = Math.round(m.edgeDensityNormalized * 100) + "%";
     edgeBar.style.background = color;
+    var dirBar = document.getElementById("dirBar");
+    dirBar.style.width = Math.round(m.directionDisorder * 100) + "%";
+    dirBar.style.background = color;
     var varBar = document.getElementById("varBar");
-    varBar.style.width = Math.round(varNorm * 100) + "%";
+    varBar.style.width = Math.round(m.varianceNormalized * 100) + "%";
     varBar.style.background = color;
+    buildPhotoBreakdown(document.getElementById("photoBreakdown"), m);
   }
 
   function readImageFile(file) {
@@ -547,6 +1112,8 @@
   document.addEventListener("DOMContentLoaded", function () {
     renderAll();
     initPhotoPanel();
+    initTidySearch();
+    initLocationSearch();
   });
 })();
 </script>
