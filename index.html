@@ -199,7 +199,7 @@
     <h2>写真から簡易判定(参考値)</h2>
     <div class="photo-dropzone" id="photoDropzone">
       <div>お部屋の写真をここにドラッグ&ドロップ、またはクリックして選択</div>
-      <input type="file" id="photoInput" accept="image/*">
+      <input type="file" id="photoInput" accept="image/*" aria-label="お部屋の写真を選択">
     </div>
     <div class="photo-preview-row" id="photoResult" style="display:none;">
       <img id="photoThumb" alt="アップロードした写真のプレビュー">
@@ -359,7 +359,7 @@
     </div>
     <div class="tidy-location-links" id="tidyLocationLinks"></div>
 
-    <input type="text" id="tidySearchInput" placeholder="例: キッチン、服、充電器..." style="margin-top:14px;">
+    <input type="text" id="tidySearchInput" aria-label="ものの整頓術を検索" placeholder="例: キッチン、服、充電器..." style="margin-top:14px;">
     <div class="chip-row" id="tidyCategoryChips"></div>
     <div class="tidy-results" id="tidyResults"></div>
     <p class="hint">「手放すか迷ったら」の判断例です。実際に手放すかはご自身の判断で。</p>
@@ -960,6 +960,7 @@
   }
 
   document.getElementById("resetBtn").addEventListener("click", function () {
+    if (!window.confirm("全てのチェックをリセットします。よろしいですか?")) return;
     state.forEach(function (cat) {
       cat.items.forEach(function (item) { item.checked = false; });
     });
@@ -1149,7 +1150,10 @@
   }
 
   function readImageFile(file) {
-    if (!file.type || file.type.indexOf("image/") !== 0) return;
+    if (!file.type || file.type.indexOf("image/") !== 0) {
+      window.alert("画像ファイルを選択してください");
+      return;
+    }
     var reader = new FileReader();
     reader.onload = function () {
       var img = new Image();
