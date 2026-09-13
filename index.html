@@ -815,6 +815,13 @@
 
       var list = document.createElement("div");
       list.className = "item-list";
+      if (cat.items.length === 0) {
+        var emptyHint = document.createElement("p");
+        emptyHint.className = "hint";
+        emptyHint.style.margin = "0";
+        emptyHint.textContent = "このカテゴリの項目は削除されました。下から追加できます。";
+        list.appendChild(emptyHint);
+      }
       cat.items.forEach(function (item, itemIdx) {
         list.appendChild(createChecklistItemRow(cat, catIdx, item, itemIdx));
       });
@@ -1170,6 +1177,10 @@
     dropzone.addEventListener("click", function () { input.click(); });
     input.addEventListener("change", function () {
       if (input.files.length) readImageFile(input.files[0]);
+      // 同じファイルを連続で選択した場合でもchangeイベントが再発火するように
+      // 選択直後にvalueをリセットする(リセットしないと同一ファイル再選択時に
+      // ブラウザがchangeを発火せず、写真が更新されないように見える)。
+      input.value = "";
     });
 
     ["dragenter", "dragover"].forEach(function (ev) {
