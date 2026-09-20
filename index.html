@@ -88,6 +88,10 @@
   }
   .item:hover .rm { opacity: 1; }
   .item .rm:hover { color: var(--bad); }
+  /* タッチ端末はhoverが効かず削除ボタンが常に見えないため、常時表示にする */
+  @media (hover: none) {
+    .item .rm { opacity: 1; }
+  }
 
   .add-row { display: flex; gap: 8px; margin-top: 10px; }
   select, input[type=text], button {
@@ -197,7 +201,7 @@
 
   <div class="panel">
     <h2>写真から簡易判定(参考値)</h2>
-    <div class="photo-dropzone" id="photoDropzone">
+    <div class="photo-dropzone" id="photoDropzone" tabindex="0" role="button" aria-label="お部屋の写真をアップロード(クリックまたはEnterで選択)">
       <div>お部屋の写真をここにドラッグ&ドロップ、またはクリックして選択</div>
       <input type="file" id="photoInput" accept="image/*" aria-label="お部屋の写真を選択">
     </div>
@@ -719,10 +723,13 @@
       chip.type = "button";
       chip.className = "chip";
       chip.textContent = cat;
+      chip.setAttribute("aria-pressed", "false");
       chip.addEventListener("click", function () {
         activeCategory = activeCategory === cat ? null : cat;
         Array.prototype.forEach.call(chipsContainer.children, function (c) {
-          c.classList.toggle("active", c === chip && activeCategory === cat);
+          var isActive = c === chip && activeCategory === cat;
+          c.classList.toggle("active", isActive);
+          c.setAttribute("aria-pressed", isActive ? "true" : "false");
         });
         renderTidyResults(input.value, activeCategory);
       });
@@ -1175,6 +1182,13 @@
     var input = document.getElementById("photoInput");
 
     dropzone.addEventListener("click", function () { input.click(); });
+    // キーボード操作(Tab+Enter/Space)でもファイル選択を開けるようにする
+    dropzone.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        input.click();
+      }
+    });
     input.addEventListener("change", function () {
       if (input.files.length) readImageFile(input.files[0]);
       // 同じファイルを連続で選択した場合でもchangeイベントが再発火するように
