@@ -916,6 +916,7 @@
     var input = document.createElement("input");
     input.type = "text";
     input.placeholder = "項目を追加(例: 本棚を整頓した)";
+    input.setAttribute("aria-label", cat.name + "にチェック項目を追加");
     input.style.flex = "1";
     var addBtn = document.createElement("button");
     addBtn.type = "button";
