@@ -227,15 +227,15 @@
         <div class="hint" id="photoScoreSub" style="margin-top:0;"></div>
         <div class="metric-bar-row">
           <span>輪郭の密度</span>
-          <div class="bar-track"><div class="bar-fill" id="edgeBar"></div></div>
+          <div class="bar-track" role="progressbar" aria-label="輪郭の密度" aria-valuemin="0" aria-valuemax="100"><div class="bar-fill" id="edgeBar"></div></div>
         </div>
         <div class="metric-bar-row">
           <span>エッジ方向の乱れ</span>
-          <div class="bar-track"><div class="bar-fill" id="dirBar"></div></div>
+          <div class="bar-track" role="progressbar" aria-label="エッジ方向の乱れ" aria-valuemin="0" aria-valuemax="100"><div class="bar-fill" id="dirBar"></div></div>
         </div>
         <div class="metric-bar-row">
           <span>色・明暗のばらつき</span>
-          <div class="bar-track"><div class="bar-fill" id="varBar"></div></div>
+          <div class="bar-track" role="progressbar" aria-label="色・明暗のばらつき" aria-valuemin="0" aria-valuemax="100"><div class="bar-fill" id="varBar"></div></div>
         </div>
         <div class="photo-breakdown" id="photoBreakdown"></div>
         <button type="button" class="secondary" id="photoClearBtn" style="margin-top:10px;">写真をクリア</button>
@@ -1175,14 +1175,20 @@
     verdictEl.style.color = color;
     document.getElementById("photoScoreSub").textContent = "輪郭密度・輪郭方向の整然さ・色や明暗のばらつきから算出した参考値です(床が写る下半分を重視)";
     var edgeBar = document.getElementById("edgeBar");
-    edgeBar.style.width = Math.round(m.edgeDensityNormalized * 100) + "%";
+    var edgePct = Math.round(m.edgeDensityNormalized * 100);
+    edgeBar.style.width = edgePct + "%";
     edgeBar.style.background = color;
+    edgeBar.parentElement.setAttribute("aria-valuenow", edgePct);
     var dirBar = document.getElementById("dirBar");
-    dirBar.style.width = Math.round(m.directionDisorder * 100) + "%";
+    var dirPct = Math.round(m.directionDisorder * 100);
+    dirBar.style.width = dirPct + "%";
     dirBar.style.background = color;
+    dirBar.parentElement.setAttribute("aria-valuenow", dirPct);
     var varBar = document.getElementById("varBar");
-    varBar.style.width = Math.round(m.varianceNormalized * 100) + "%";
+    var varPct = Math.round(m.varianceNormalized * 100);
+    varBar.style.width = varPct + "%";
     varBar.style.background = color;
+    varBar.parentElement.setAttribute("aria-valuenow", varPct);
     buildPhotoBreakdown(document.getElementById("photoBreakdown"), m);
   }
 
@@ -1195,8 +1201,10 @@
     reader.onload = function () {
       var img = new Image();
       img.onload = function () { analyzePhoto(img, reader.result); };
+      img.onerror = function () { window.alert("画像を読み込めませんでした。別の画像でお試しください"); };
       img.src = reader.result;
     };
+    reader.onerror = function () { window.alert("ファイルの読み込みに失敗しました"); };
     reader.readAsDataURL(file);
   }
 
