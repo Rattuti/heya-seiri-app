@@ -88,6 +88,9 @@
   }
   .item:hover .rm { opacity: 1; }
   .item .rm:hover { color: var(--bad); }
+  /* キーボードでTab移動した時もhoverと同様に表示する(opacity:0のままだと
+     フォーカスリングだけ見えてラベルが読めない状態になるため) */
+  .item .rm:focus-visible { opacity: 1; }
   /* タッチ端末はhoverが効かず削除ボタンが常に見えないため、常時表示にする */
   @media (hover: none) {
     .item .rm { opacity: 1; }
@@ -218,7 +221,9 @@
     <h2>写真から簡易判定(参考値)</h2>
     <div class="photo-dropzone" id="photoDropzone" tabindex="0" role="button" aria-label="お部屋の写真をアップロード(クリックまたはEnterで選択)">
       <div>お部屋の写真をここにドラッグ&ドロップ、またはクリックして選択</div>
-      <input type="file" id="photoInput" accept="image/*" aria-label="お部屋の写真を選択">
+      <!-- tabindex=-1: 親のdropzone(role=button, tabindex=0)がEnter/Spaceでinput.click()を
+           呼ぶため、この input 自体はTab移動では止まらないようにする(重複したタブ停止を防ぐ) -->
+      <input type="file" id="photoInput" accept="image/*" aria-label="お部屋の写真を選択" tabindex="-1">
     </div>
     <div class="photo-preview-row" id="photoResult" style="display:none;">
       <img id="photoThumb" alt="アップロードした写真のプレビュー">
