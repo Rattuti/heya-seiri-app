@@ -892,6 +892,9 @@
     rm.type = "button";
     rm.className = "rm";
     rm.textContent = "削除";
+    // ボタン単体では「削除」としか読み上げられず、どの項目の削除か
+    // スクリーンリーダーで分からないため、項目名を含むaria-labelを付与する
+    rm.setAttribute("aria-label", item.text + " を削除");
     rm.addEventListener("click", function () {
       cat.items.splice(itemIdx, 1);
       renderAll();
