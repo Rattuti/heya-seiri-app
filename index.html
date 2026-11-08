@@ -178,7 +178,9 @@
     font-size: var(--fs-s); padding: 4px 10px; border-radius: 999px;
     border: 1px solid var(--border); background: var(--panel); color: var(--muted); cursor: pointer;
   }
-  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  /* 白文字(#fff)とaccentの組合せはコントラスト比約3.6:1でAA(4.5:1)未達のため、
+     既にホバー色として使っているaccent-darkを使う(5.9:1、同系色で見た目は変えない) */
+  .chip.active { background: var(--accent-dark); color: #fff; border-color: var(--accent-dark); }
   .tidy-results { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
   .tidy-item { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .tidy-item-name { font-weight: 600; font-size: var(--fs-m); }
@@ -943,7 +945,9 @@
     }
     addBtn.addEventListener("click", addItem);
     input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") addItem();
+      // 日本語IME変換確定のEnterでもkeydownが発火するため、変換中(isComposing)は
+      // 追加しない(確定前の文字列で追加されてしまう・変換のEnterで誤発火するのを防ぐ)
+      if (e.key === "Enter" && !e.isComposing) addItem();
     });
     addRow.appendChild(input);
     addRow.appendChild(addBtn);
