@@ -835,6 +835,12 @@
     return "まずはチェックを始めましょう";
   }
 
+  // renderAll()はチェックリスト全体をinnerHTML=""で作り直すため、チェックボックスの
+  // トグルや項目追加の直後は毎回フォーカスが失われる(特にキーボード操作時に、
+  // どこを操作していたか分からなくなる)。直前の操作対象を記録し、再描画後に
+  // 同じ要素へフォーカスを戻す。
+  var pendingFocus = null;
+
   function renderChecklist() {
     var container = document.getElementById("checklistContainer");
     container.innerHTML = "";
@@ -867,10 +873,16 @@
       });
       block.appendChild(list);
 
-      block.appendChild(createAddItemRow(cat));
+      block.appendChild(createAddItemRow(cat, catIdx));
 
       container.appendChild(block);
     });
+
+    if (pendingFocus) {
+      var toFocus = document.getElementById(pendingFocus.id);
+      pendingFocus = null;
+      if (toFocus) toFocus.focus();
+    }
   }
 
   function createChecklistItemRow(cat, catIdx, item, itemIdx) {
@@ -887,6 +899,7 @@
     cb.checked = item.checked;
     cb.addEventListener("change", function () {
       item.checked = cb.checked;
+      pendingFocus = { id: cbId };
       renderAll();
     });
 
@@ -924,11 +937,13 @@
     return row;
   }
 
-  function createAddItemRow(cat) {
+  function createAddItemRow(cat, catIdx) {
     var addRow = document.createElement("div");
     addRow.className = "add-row";
     var input = document.createElement("input");
     input.type = "text";
+    var inputId = "add-input-" + catIdx;
+    input.id = inputId;
     input.placeholder = "項目を追加(例: 本棚を整頓した)";
     input.setAttribute("aria-label", cat.name + "にチェック項目を追加");
     input.style.flex = "1";
@@ -940,7 +955,9 @@
       var text = input.value.trim();
       if (!text) return;
       cat.items.push({ text: text, checked: false });
-      input.value = "";
+      // 連続して複数項目を追加しやすいよう、再描画後も同じ追加欄にフォーカスを戻す
+      // (入力欄はinnerHTML=""で作り直されるため、何もしないと毎回クリックし直しになる)
+      pendingFocus = { id: inputId };
       renderAll();
     }
     addBtn.addEventListener("click", addItem);
