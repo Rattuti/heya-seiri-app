@@ -387,11 +387,14 @@
         <option value="その他">その他</option>
       </select>
     </div>
-    <div class="tidy-location-links" id="tidyLocationLinks"></div>
+    <!-- aria-live: 場所の選択で検索リンクが切り替わる変化をスクリーンリーダーへ知らせる -->
+    <div class="tidy-location-links" id="tidyLocationLinks" aria-live="polite"></div>
 
     <input type="text" id="tidySearchInput" aria-label="ものの整頓術を検索" placeholder="例: キッチン、服、充電器..." style="margin-top:14px;">
     <div class="chip-row" id="tidyCategoryChips"></div>
-    <div class="tidy-results" id="tidyResults"></div>
+    <!-- aria-live: 検索語入力・カテゴリ選択で結果が書き換わった時にスクリーンリーダーへ
+         件数・内容の変化を知らせる(視覚的な変化のみでフィードバックが無かったため) -->
+    <div class="tidy-results" id="tidyResults" aria-live="polite"></div>
     <p class="hint">「手放すか迷ったら」の判断例です。実際に手放すかはご自身の判断で。</p>
   </div>
 
@@ -916,6 +919,10 @@
     rm.setAttribute("aria-label", item.text + " を削除");
     rm.addEventListener("click", function () {
       cat.items.splice(itemIdx, 1);
+      // 削除した行自体は再描画後に無くなるため、チェックボックス変更時と同様に
+      // 同じカテゴリの追加欄へフォーカスを戻す(キーボード操作時にフォーカスが
+      // documentへ飛んで迷子になるのを防ぐ)
+      pendingFocus = { id: "add-input-" + catIdx };
       renderAll();
     });
 
@@ -1007,6 +1014,12 @@
 
       var track = document.createElement("div");
       track.className = "bar-track";
+      // 写真解析バー(role=progressbar)と同様に進捗をスクリーンリーダーへ伝える
+      track.setAttribute("role", "progressbar");
+      track.setAttribute("aria-label", cat.name + "の進捗");
+      track.setAttribute("aria-valuemin", "0");
+      track.setAttribute("aria-valuemax", "100");
+      track.setAttribute("aria-valuenow", String(Math.round(catPct)));
       var fill = document.createElement("div");
       fill.className = "bar-fill";
       fill.style.width = catPct + "%";
